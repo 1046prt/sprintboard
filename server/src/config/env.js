@@ -25,6 +25,9 @@ export const env = {
   get port() {
     return Number(process.env.PORT) || 5000;
   },
+  get mongoUri() {
+    return process.env.MONGODB_URI;
+  },
   get jwtSecret() {
     return process.env.JWT_SECRET;
   },
@@ -40,7 +43,7 @@ export const env = {
 };
 
 export function assertEnv() {
-  const missing = ['JWT_SECRET'].filter((key) => !process.env[key]);
+  const missing = ['MONGODB_URI', 'JWT_SECRET'].filter((key) => !process.env[key]);
   if (missing.length) {
     console.error(`Missing required environment variables: ${missing.join(', ')}`);
     console.error('Copy .env.example to server/.env and fill in the values.');

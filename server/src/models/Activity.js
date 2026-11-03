@@ -1,8 +1,6 @@
 import mongoose from 'mongoose';
 import { ACTIVITY_TYPES } from '../constants.js';
 
-// `issue` is kept even after an issue is deleted, so it is a plain reference
-// and the readable sentence lives in `action`.
 const activitySchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },

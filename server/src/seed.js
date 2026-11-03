@@ -9,7 +9,7 @@ const { default: Project } = await import('./models/Project.js');
 const { default: Issue } = await import('./models/Issue.js');
 const { default: Activity } = await import('./models/Activity.js');
 
-await connectDB();
+await connectDB(env.mongoUri);
 await Promise.all([User.deleteMany(), Project.deleteMany(), Issue.deleteMany(), Activity.deleteMany()]);
 
 const admin = await User.create({ name: 'Ava Admin', email: 'admin@sprintboard.dev', password: 'Password123', role: 'admin' });

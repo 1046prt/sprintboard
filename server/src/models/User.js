@@ -1,14 +1,36 @@
+import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { createModel } from './base.js';
+import { ROLES } from '../constants.js';
 
-const User = createModel('User', 'users');
-User.prototype.comparePassword = function comparePassword(candidate) {
+const SALT_ROUNDS = 10;
+
+const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true, minlength: 2, maxlength: 60 },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    password: { type: String, required: true, select: false },
+    role: { type: String, enum: ROLES, default: 'member' },
+    managerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
+  },
+  { timestamps: true }
+);
+
+userSchema.pre('save', async function hashPassword(next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
+  next();
+});
+
+userSchema.methods.comparePassword = function comparePassword(candidate) {
   return bcrypt.compare(candidate, this.password);
 };
 
-const originalCreate = User.create;
-User.create = async function create(data) {
-  return originalCreate.call(this, { ...data, password: await bcrypt.hash(data.password, 10) });
-};
+userSchema.set('toJSON', {
+  transform: (_doc, ret) => {
+    delete ret.password;
+    delete ret.__v;
+    return ret;
+  },
+});
 
-export default User;
+export default mongoose.model('User', userSchema);

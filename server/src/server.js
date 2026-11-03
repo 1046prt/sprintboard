@@ -7,7 +7,7 @@ const { default: app } = await import('./app.js');
 const { connectDB, disconnectDB } = await import('./config/db.js');
 const { initSocket } = await import('./socket.js');
 
-await connectDB();
+await connectDB(env.mongoUri);
 
 const server = http.createServer(app);
 app.set('io', initSocket(server));
